@@ -1,13 +1,16 @@
 package me.jerilynmensah.springboot13;
 
 
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
+import java.util.Map;
+
 
 @Controller
 public class HomeController {
@@ -15,32 +18,35 @@ public class HomeController {
     @Autowired
     ActorRepository actorRepository;
 
+    @Autowired
+    CloudinaryConfig cloudc;
+
     @RequestMapping("/")
-    public String index(Model model){
-        //First,let's create an actor
-        Actor actor = new Actor();
-        actor.setName("Sandra Bullock");
-        actor.setRealname("Sandra Mae Bullowski");
-
-        //Now time to create a movie
-        Movie movie = new Movie();
-        movie.setTitle("Emoji Movie");
-        movie.setYear(2017);
-        movie.setDescription("About Emojis...");
-
-        //Add the movie to an empty list
-        Set<Movie> movies = new HashSet<Movie>();
-        movies.add(movie);
-
-        //Add the list of movies to the actor's movie list
-        actor.setMovies(movies);
-
-        //Save the actor to the database
-        actorRepository.save(actor);
-
-        //Grab all the actors from the database and send them to
-        //the template
+    public String listActors(Model model){
         model.addAttribute("actors", actorRepository.findAll());
-        return "index";
+        return "list";
+    }
+
+    @GetMapping("/add")
+    public String newActor(Model model) {
+        model.addAttribute("actor", new Actor());
+        return "form";
+    }
+
+    @PostMapping("/add")
+    public String processActor(@ModelAttribute Actor actor, @RequestParam("file")MultipartFile file){
+        if(file.isEmpty()) {
+            return "redirect:/add";
+        }
+        try {
+            Map uploadResult = cloudc.upload(file.getBytes(),
+            ObjectUtils.asMap("resourcetype", "auto"));
+            actor.setHeadshot(uploadResult.get("url") .toString());
+            actorRepository.save(actor);
+        } catch (IOException e){
+            e.printStackTrace();
+            return "redirect:/add";
+        }
+        return "redirect:/";
     }
 }

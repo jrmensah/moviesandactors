@@ -10,6 +10,7 @@ public class Actor {
     private long id;
     private String name;
     private String realname;
+    private String headshot;
 
     @ManyToMany(mappedBy = "cast")
     private Set<Movie> movies;
@@ -38,11 +39,11 @@ public class Actor {
         this.realname = realname;
     }
 
-    public Set<Movie> getMovies() {
-        return movies;
+    public String getHeadshot() {
+        return headshot;
     }
 
-    public void setMovies(Set<Movie> movies) {
-        this.movies = movies;
+    public void setHeadshot(String headshot) {
+        this.headshot = headshot;
     }
 }
