@@ -11,9 +11,7 @@ public class Actor {
     private String name;
     private String realname;
     private String headshot;
-
-    @ManyToMany(mappedBy = "cast")
-    private Set<Movie> movies;
+    
 
     public long getId() {
         return id;
