@@ -11,7 +11,7 @@ public class Actor {
     private String name;
     private String realname;
     private String headshot;
-    
+
 
     public long getId() {
         return id;
